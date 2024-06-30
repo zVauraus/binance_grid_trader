@@ -617,6 +617,30 @@ class CtaEngine(BaseEngine):
         # Update GUI
         self.put_strategy_event(strategy)
 
+    def process_account_event(self, event: Event):
+        """"""
+        account = event.data
+
+        strategies = list(self.symbol_strategy_map.values())
+        strategies = strategies[0]
+        if not strategies:
+            return
+
+        for strategy in strategies:
+            if strategy.inited:
+                self.call_strategy_func(strategy, strategy.on_account, account)
+
+    def process_position_event(self, event: Event):
+        """"""
+        position = event.data
+        strategies = self.symbol_strategy_map[position.vt_symbol]
+        if not strategies:
+            return
+
+        for strategy in strategies:
+            if strategy.inited:
+                self.call_strategy_func(strategy, strategy.on_position, position)
+
     def send_order(
             self,
             strategy: CtaTemplate,
